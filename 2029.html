@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dec 10, 2025 → Dec 10, 2029 Countdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #0b1020;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.35);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 40%, #000 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+      border-radius: 24px;
+      padding: 24px 20px 28px;
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(79, 70, 229, 0.28);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(18px);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    header h1 span.highlight {
+      background: radial-gradient(circle at 0 0, #4f46e5, #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .dates {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .dates span {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 720px) {
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(79,70,229,0.12), rgba(15,23,42,0.95));
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(236,72,153,0.06) 0, transparent 60%),
+        radial-gradient(circle at 100% 0, rgba(56,189,248,0.05) 0, transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Countdown big numbers */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 540px) {
+      .countdown-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .time-box {
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), #020617);
+      border-radius: 16px;
+      padding: 12px 10px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      text-align: center;
+    }
+
+    .time-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .time-value {
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .time-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.1);
+      border: 1px solid rgba(22, 163, 74, 0.4);
+      color: #bbf7d0;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,0.9);
+    }
+
+    .percent {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      margin-top: 12px;
+    }
+
+    .progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #4f46e5, #ec4899, #22c55e);
+      box-shadow: 0 0 20px rgba(79,70,229,0.9);
+      transition: width 0.4s ease-out;
+    }
+
+    /* Timeline */
+    .timeline-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .timeline {
+      margin-top: 4px;
+    }
+
+    .timeline-bar {
+      position: relative;
+      height: 4px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .timeline-progress {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(79,70,229,0.9), rgba(236,72,153,0.9));
+      transition: width 0.4s ease-out;
+    }
+
+    .timeline-years {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .timeline-year {
+      text-align: center;
+      position: relative;
+      flex: 1;
+    }
+
+    .timeline-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: #020617;
+      border: 2px solid rgba(148, 163, 184, 0.7);
+      margin: 0 auto 4px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .timeline-year.active .timeline-dot {
+      border-color: #4f46e5;
+      box-shadow: 0 0 10px rgba(79,70,229,0.9);
+    }
+
+    .timeline-year .label {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .mini-note {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .mini-note strong {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    /* Right card: nerd stats */
+    .stats-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .stats-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-variant-numeric: tabular-nums;
+      background: rgba(15,23,42,0.95);
+      font-size: 0.78rem;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(79,70,229,0.65);
+      background: rgba(79,70,229,0.11);
+      color: #c7d2fe;
+      margin-top: 8px;
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #6366f1;
+      box-shadow: 0 0 8px rgba(99,102,241,0.9);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--muted);
+      opacity: 0.85;
+    }
+
+    .footer-note span {
+      color: #a855f7;
+      font-weight: 500;
+    }
+
+    .finished {
+      color: var(--danger);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>
+        <span>Countdown to</span>
+        <span class="highlight">Dec 10, 2029</span>
+      </h1>
+      <p>From Dec 10, 2025 → Dec 10, 2029 · Live timeline + nerd stats</p>
+    </header>
+
+    <div class="dates">
+      <span>Start: <strong>10 Dec 2025</strong></span>
+      <span>End: <strong>10 Dec 2029</strong></span>
+      <span id="todayLabel"></span>
+    </div>
+
+    <div class="layout-grid">
+      <!-- Left: main countdown + progress -->
+      <section class="card">
+        <div class="card-content">
+          <div class="countdown-grid">
+            <div class="time-box">
+              <div class="time-label">Days</div>
+              <div class="time-value" id="days">0</div>
+              <div class="time-sub">Total days left</div>
+            </div>
+            <div class="time-box">
+              <div class="time-label">Hours</div>
+              <div class="time-value" id="hours">0</div>
+              <div class="time-sub">Within this day</div>
+            </div>
+            <div class="time-box">
+              <div class="time-label">Minutes</div>
+              <div class="time-value" id="minutes">0</div>
+              <div class="time-sub">Ticking away…</div>
+            </div>
+            <div class="time-box">
+              <div class="time-label">Seconds</div>
+              <div class="time-value" id="seconds">0</div>
+              <div class="time-sub">Real-time</div>
+            </div>
+          </div>
+
+          <div class="status-row">
+            <div id="statusBadge" class="status-badge">
+              <span class="status-dot"></span>
+              <span id="statusText">Countdown running</span>
+            </div>
+            <div class="percent">
+              Completed: <span id="percentDone">0.00</span>%
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-label-row">
+              <span>Overall progress</span>
+              <span id="elapsedLabel">Elapsed: 0 days</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-title">Timeline · Dec 10, 2025 → Dec 10, 2029</div>
+            <div class="timeline-bar">
+              <div class="timeline-progress" id="timelineProgress"></div>
+            </div>
+            <div class="timeline-years" id="timelineYears">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+          <div class="mini-note">
+            <strong>Tip:</strong> This timer uses your device's local time.  
+            If the time looks off… maybe your clock is.
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: details & nerd stats -->
+      <section class="card">
+        <div class="card-content">
+          <h2 style="font-size:0.95rem; margin-bottom:4px;">Timeline details</h2>
+          <p style="font-size:0.8rem; color:var(--muted);">
+            This is a 4-year journey from <strong>10 Dec 2025</strong> to
+            <strong>10 Dec 2029</strong>. Below are some stats based on the exact
+            difference between these dates.
+          </p>
+
+          <ul class="stats-list">
+            <li>
+              <span>Total duration</span>
+              <span class="pill" id="totalDays">– days</span>
+            </li>
+            <li>
+              <span>Total hours</span>
+              <span class="pill" id="totalHours">– hours</span>
+            </li>
+            <li>
+              <span>Time passed</span>
+              <span class="pill" id="passedLabel">–</span>
+            </li>
+            <li>
+              <span>Time remaining</span>
+              <span class="pill" id="remainingLabel">–</span>
+            </li>
+          </ul>
+
+          <div class="tag">
+            <span class="tag-dot"></span>
+            <span id="modeTag">Live countdown active</span>
+          </div>
+
+          <p class="footer-note">
+            Built as a single-file HTML · CSS · JS page.  
+            Perfect for dropping straight on <span>GitHub Pages</span> or any static host.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Fixed start and end dates in LOCAL time
+      const startDate = new Date(2025, 11, 10, 0, 0, 0); // 10 Dec 2025
+      const endDate = new Date(2029, 11, 10, 0, 0, 0);   // 10 Dec 2029
+
+      const daysEl = document.getElementById("days");
+      const hoursEl = document.getElementById("hours");
+      const minutesEl = document.getElementById("minutes");
+      const secondsEl = document.getElementById("seconds");
+      const percentDoneEl = document.getElementById("percentDone");
+      const elapsedLabelEl = document.getElementById("elapsedLabel");
+      const progressFillEl = document.getElementById("progressFill");
+      const timelineProgressEl = document.getElementById("timelineProgress");
+      const todayLabelEl = document.getElementById("todayLabel");
+      const totalDaysEl = document.getElementById("totalDays");
+      const totalHoursEl = document.getElementById("totalHours");
+      const passedLabelEl = document.getElementById("passedLabel");
+      const remainingLabelEl = document.getElementById("remainingLabel");
+      const statusTextEl = document.getElementById("statusText");
+      const statusBadgeEl = document.getElementById("statusBadge");
+      const modeTagEl = document.getElementById("modeTag");
+      const timelineYearsEl = document.getElementById("timelineYears");
+
+      const fullDurationMs = endDate.getTime() - startDate.getTime();
+
+      // Build static year labels for timeline
+      const years = [
+        { label: "Dec 10, 2025", year: 2025 },
+        { label: "2026", year: 2026 },
+        { label: "2027", year: 2027 },
+        { label: "2028", year: 2028 },
+        { label: "Dec 10, 2029", year: 2029 },
+      ];
+
+      years.forEach((info, idx) => {
+        const div = document.createElement("div");
+        div.className = "timeline-year";
+        div.dataset.index = String(idx);
+
+        const dot = document.createElement("div");
+        dot.className = "timeline-dot";
+
+        const label = document.createElement("span");
+        label.className = "label";
+        label.textContent = info.label;
+
+        div.appendChild(dot);
+        div.appendChild(label);
+        timelineYearsEl.appendChild(div);
+      });
+
+      function formatMs(ms) {
+        // Return "Xd Yh Zm" style from milliseconds
+        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        const days = Math.floor(totalSeconds / (3600 * 24));
+        const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+        const parts = [];
+        if (days) parts.push(days + "d");
+        if (hours) parts.push(hours + "h");
+        if (minutes || (!days && !hours)) parts.push(minutes + "m");
+
+        return parts.join(" ");
+      }
+
+      function updateTodayLabel() {
+        const now = new Date();
+        const options = { day: "2-digit", month: "short", year: "numeric" };
+        todayLabelEl.textContent = "Today: " + now.toLocaleDateString(undefined, options);
+      }
+
+      function updateStaticTotals() {
+        const totalDays = Math.round(fullDurationMs / (1000 * 60 * 60 * 24));
+        const totalHours = Math.round(fullDurationMs / (1000 * 60 * 60));
+        totalDaysEl.textContent = totalDays + " days";
+        totalHoursEl.textContent = totalHours.toLocaleString() + " hours";
+      }
+
+      function updateTimelineActive(progressRatio) {
+        const children = timelineYearsEl.querySelectorAll(".timeline-year");
+        children.forEach((el) => el.classList.remove("active"));
+
+        // Activate year marker based on progress
+        const idx = Math.min(
+          children.length - 1,
+          Math.floor(progressRatio * children.length)
+        );
+
+        if (children[idx]) {
+          children[idx].classList.add("active");
+        }
+      }
+
+      function tick() {
+        const now = new Date();
+        const nowMs = now.getTime();
+
+        const elapsedMs = nowMs - startDate.getTime();
+        const remainingMs = endDate.getTime() - nowMs;
+
+        // Clamp for progress
+        let progressRatio = elapsedMs / fullDurationMs;
+        if (progressRatio < 0) progressRatio = 0;
+        if (progressRatio > 1) progressRatio = 1;
+
+        const percentDone = (progressRatio * 100).toFixed(2);
+        percentDoneEl.textContent = percentDone;
+
+        const elapsedDays = Math.max(0, Math.floor(elapsedMs / (1000 * 60 * 60 * 24)));
+        elapsedLabelEl.textContent = "Elapsed: " + elapsedDays + " days";
+
+        progressFillEl.style.width = percentDone + "%";
+        timelineProgressEl.style.width = percentDone + "%";
+        updateTimelineActive(progressRatio);
+
+        passedLabelEl.textContent = formatMs(elapsedMs) || "0m";
+        remainingLabelEl.textContent =
+          remainingMs > 0 ? formatMs(remainingMs) : "0m";
+
+        if (remainingMs <= 0) {
+          // Countdown finished
+          daysEl.textContent = "0";
+          hoursEl.textContent = "0";
+          minutesEl.textContent = "0";
+          secondsEl.textContent = "0";
+
+          statusTextEl.textContent = "Countdown finished · 10 Dec 2029 reached!";
+          statusBadgeEl.classList.add("finished");
+          modeTagEl.textContent = "Finished · Timeline complete";
+          modeTagEl.style.borderColor = "rgba(248,113,113,0.8)";
+          modeTagEl.style.background = "rgba(248,113,113,0.12)";
+          return;
+        }
+
+        // Live countdown numbers
+        const totalSeconds = Math.floor(remainingMs / 1000);
+        const days = Math.floor(totalSeconds / (3600 * 24));
+        const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        daysEl.textContent = String(days);
+        hoursEl.textContent = String(hours).padStart(2, "0");
+        minutesEl.textContent = String(minutes).padStart(2, "0");
+        secondsEl.textContent = String(seconds).padStart(2, "0");
+      }
+
+      updateTodayLabel();
+      updateStaticTotals();
+      tick();
+      setInterval(tick, 1000);
+      setInterval(updateTodayLabel, 60 * 1000);
+    })();
+  </script>
+</body>
+  </html>
